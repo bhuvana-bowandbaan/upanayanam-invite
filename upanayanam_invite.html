@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Upanayanam Invitation</title>
   <style>
     body {
       margin: 0;
-      background-color: #f9f5ef;
+      background-color: #fdf6f0;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -14,36 +14,46 @@
       overflow: hidden;
       font-family: 'Segoe UI', sans-serif;
     }
+
     .page {
       display: none;
       position: relative;
     }
+
     .page.active {
       display: block;
     }
+
     .page img {
       max-width: 100vw;
       max-height: 100vh;
       object-fit: contain;
       cursor: pointer;
+      display: block;
     }
+
     .name-overlay {
       position: absolute;
-      top: 20%;
+      top: 18%;
       width: 100%;
       text-align: center;
       font-size: 2em;
       font-weight: bold;
       color: maroon;
-      text-shadow: 1px 1px 3px #fff;
+      text-shadow: 1px 1px 3px white;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
+
+  <!-- Envelope Page -->
   <div id="page1" class="page active">
     <div class="name-overlay" id="nameOverlay"></div>
     <img src="invite_page1.jpeg" alt="Envelope" onclick="nextPage()" />
   </div>
+
+  <!-- Other Pages -->
   <div id="page2" class="page">
     <img src="invite_page2.jpeg" alt="Page 1" onclick="nextPage()" />
   </div>
@@ -54,7 +64,7 @@
     <img src="invite_page4.jpeg" alt="Page 3" onclick="nextPage()" />
   </div>
   <div id="page5" class="page">
-    <img src="invite_page5.jpeg" alt="Last Page" />
+    <img src="invite_page5.jpeg" alt="Page 4" />
   </div>
 
   <script>
@@ -71,7 +81,7 @@
 
     function getNameFromURL() {
       const params = new URLSearchParams(window.location.search);
-      return params.get('name') || 'Dear Guest';
+      return params.get('name') || '';
     }
 
     document.getElementById('nameOverlay').innerText = getNameFromURL();
