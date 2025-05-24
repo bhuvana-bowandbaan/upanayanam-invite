@@ -1,65 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>Upanayanam Invitation</title>
   <style>
     body {
-      background-color: #fdf6e3;
+      margin: 0;
+      background-color: #f2f2f2;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
-      font-family: 'Georgia', serif;
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
     }
-    #container {
+    .page {
+      display: none;
+      position: relative;
+    }
+    .page.active {
+      display: block;
+    }
+    .page img {
+      max-width: 100vw;
+      max-height: 100vh;
+      object-fit: contain;
+    }
+    .name-overlay {
+      position: absolute;
+      top: 22%;
+      width: 100%;
       text-align: center;
-    }
-    img {
-      max-width: 90vw;
-      max-height: 80vh;
-      border: 5px solid #d4af37;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      cursor: pointer;
-    }
-    #recipient {
-      font-size: 1.5em;
-      margin-bottom: 10px;
-      color: #6b4c1d;
+      font-size: 2em;
+      font-weight: bold;
+      color: maroon;
+      text-shadow: 1px 1px 3px #fff;
     }
   </style>
 </head>
 <body>
-  <div id="container">
-    <div id="recipient">Dear <span id="name">Friend</span>,</div>
-    <img id="invite" src="invite_page_4.jpg" alt="Invitation" onclick="nextImage()">
+  <div id="page1" class="page active">
+    <div class="name-overlay" id="nameOverlay"></div>
+    <img src="Page1.jpeg" alt="Envelope" onclick="nextPage()" />
+  </div>
+  <div id="page2" class="page">
+    <img src="Page2.jpeg" alt="First Page" onclick="nextPage()" />
+  </div>
+  <div id="page3" class="page">
+    <img src="Page3.jpeg" alt="Second Page" onclick="nextPage()" />
+  </div>
+  <div id="page4" class="page">
+    <img src="Page4.jpeg" alt="Third Page" />
   </div>
 
   <script>
-    const images = [
-      'invite_page_4.jpg',  // Envelope
-      'invite_page_1.jpg',  // First page
-      'invite_page_2.jpg',  // Second page
-      'invite_page_3.jpg'   // Third page
-    ];
-    let current = 0;
+    const pages = ['page1', 'page2', 'page3', 'page4'];
+    let currentPage = 0;
 
-    function nextImage() {
-      if (current < images.length - 1) {
-        current++;
-        document.getElementById('invite').src = images[current];
+    function nextPage() {
+      document.getElementById(pages[currentPage]).classList.remove('active');
+      currentPage++;
+      if (currentPage < pages.length) {
+        document.getElementById(pages[currentPage]).classList.add('active');
       }
     }
 
-    // Optionally personalize name via URL: ?name=Balu
-    const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get('name');
-    if (name) {
-      document.getElementById('name').textContent = name;
+    function getNameFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('name') || 'Dear Guest';
     }
+
+    document.getElementById('nameOverlay').innerText = getNameFromURL();
   </script>
 </body>
 </html>
