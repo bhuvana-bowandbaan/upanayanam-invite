@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upanayanam Invitation</title>
+  <style>
+    body {
+      background-color: #fdf6e3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'Georgia', serif;
+    }
+    #container {
+      text-align: center;
+    }
+    img {
+      max-width: 90vw;
+      max-height: 80vh;
+      border: 5px solid #d4af37;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+    #recipient {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      color: #6b4c1d;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="recipient">Dear <span id="name">Friend</span>,</div>
+    <img id="invite" src="invite_page_4.jpg" alt="Invitation" onclick="nextImage()">
+  </div>
+
+  <script>
+    const images = [
+      'invite_page_4.jpg',  // Envelope
+      'invite_page_1.jpg',  // First page
+      'invite_page_2.jpg',  // Second page
+      'invite_page_3.jpg'   // Third page
+    ];
+    let current = 0;
+
+    function nextImage() {
+      if (current < images.length - 1) {
+        current++;
+        document.getElementById('invite').src = images[current];
+      }
+    }
+
+    // Optionally personalize name via URL: ?name=Balu
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('name');
+    if (name) {
+      document.getElementById('name').textContent = name;
+    }
+  </script>
+</body>
+</html>
