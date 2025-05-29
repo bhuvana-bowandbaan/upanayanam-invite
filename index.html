@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <title>Upanayanam Invitation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       margin: 0;
       background-color: #fdf6f0;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      overflow: hidden;
-      font-family: 'Segoe UI', sans-serif;
+      position: relative;
     }
 
     .page {
@@ -25,8 +26,8 @@
     }
 
     .page img {
-      max-width: 100vw;
-      max-height: 100vh;
+      width: 100vw;
+      height: 100vh;
       object-fit: contain;
       display: block;
     }
@@ -45,25 +46,66 @@
 
     .nav-buttons {
       position: absolute;
-      top: 20px;
-      right: 20px;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
-      flex-direction: column;
       gap: 10px;
+      z-index: 2;
     }
 
     .nav-buttons button {
       background-color: maroon;
       color: white;
       border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
+      padding: 10px 16px;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 14px;
     }
 
     .nav-buttons button:hover {
       background-color: darkred;
+    }
+
+    .countdown {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2em;
+      color: darkgreen;
+      font-weight: bold;
+    }
+
+    audio {
+      display: none;
+    }
+
+    .audio-toggle {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: maroon;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      z-index: 2;
+    }
+
+    @media (max-width: 768px) {
+      .name-overlay {
+        font-size: 1.5em;
+      }
+
+      .nav-buttons {
+        flex-direction: column;
+        gap: 6px;
+        bottom: 10px;
+      }
     }
   </style>
 </head>
@@ -89,7 +131,7 @@
     <img src="invite_page5.jpeg" alt="Page 4" />
   </div>
 
-  <!-- Navigation Buttons -->
+  <!-- Buttons -->
   <div class="nav-buttons">
     <button onclick="goHome()">Home</button>
     <button onclick="prevPage()">Back</button>
@@ -97,10 +139,21 @@
     <button onclick="play()">Play</button>
   </div>
 
+  <!-- Countdown -->
+  <div id="countdown" class="countdown"></div>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" loop autoplay>
+    <source src="your-music-file.mp3" type="audio/mpeg" />
+  </audio>
+  <button class="audio-toggle" onclick="toggleMusic()">🔊 Music</button>
+
   <script>
     const pages = ['page1', 'page2', 'page3', 'page4', 'page5'];
     let currentPage = 0;
     let interval;
+    let countdownInterval;
+    const countdownElement = document.getElementById('countdown');
 
     function showPage(index) {
       if (index < 0 || index >= pages.length) return;
@@ -109,21 +162,38 @@
       document.getElementById(pages[currentPage]).classList.add('active');
     }
 
+    function startCountdown() {
+      let seconds = 3;
+      countdownElement.innerText = `Next in ${seconds}s`;
+      countdownInterval = setInterval(() => {
+        seconds--;
+        countdownElement.innerText = `Next in ${seconds}s`;
+        if (seconds <= 0) {
+          clearInterval(countdownInterval);
+          autoNextPage();
+        }
+      }, 1000);
+    }
+
     function autoNextPage() {
       if (currentPage < pages.length - 1) {
         showPage(currentPage + 1);
+        startCountdown();
       } else {
-        pause(); // Stop at the last page
+        pause();
+        countdownElement.innerText = '';
       }
     }
 
     function play() {
-      pause(); // clear previous interval before starting new one
-      interval = setInterval(autoNextPage, 3000); // every 3 seconds
+      pause();
+      startCountdown();
     }
 
     function pause() {
       clearInterval(interval);
+      clearInterval(countdownInterval);
+      countdownElement.innerText = '';
     }
 
     function prevPage() {
@@ -141,11 +211,26 @@
       return params.get('name') || '';
     }
 
-    // Add name with 3 space padding
+    // Add name with 3-space padding
     document.getElementById('nameOverlay').innerText = '\u00A0\u00A0\u00A0' + getNameFromURL();
 
-    // Auto start on load
-    play();
+    // Music control
+    const music = document.getElementById('bgMusic');
+    let musicPlaying = true;
+    function toggleMusic() {
+      if (musicPlaying) {
+        music.pause();
+        musicPlaying = false;
+      } else {
+        music.play();
+        musicPlaying = true;
+      }
+    }
+
+    // Start auto-play on load
+    window.onload = () => {
+      play();
+    };
   </script>
 </body>
 </html>
