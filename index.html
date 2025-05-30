@@ -3,22 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <title>Upanayanam Invitation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       margin: 0;
       background-color: #fdf6f0;
       font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      position: relative;
+      overflow: hidden;
     }
 
     .page {
       display: none;
       position: relative;
+      height: 100vh;
+      width: 100vw;
     }
 
     .page.active {
@@ -26,10 +23,12 @@
     }
 
     .page img {
-      width: 100vw;
-      height: 100vh;
+      max-width: 100%;
+      max-height: 100vh;
       object-fit: contain;
       display: block;
+      margin: auto;
+      cursor: pointer;
     }
 
     .name-overlay {
@@ -42,168 +41,129 @@
       color: maroon;
       text-shadow: 1px 1px 3px white;
       pointer-events: none;
+      padding-left: 3ch; /* 3 character space */
     }
 
-    .nav-buttons {
-      position: absolute;
-      bottom: 15px;
-      left: 50%;
-      transform: translateX(-50%);
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      right: 0;
       display: flex;
-      gap: 10px;
-      z-index: 2;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      z-index: 10;
     }
 
-    .nav-buttons button {
-      background-color: maroon;
-      color: white;
+    .controls button {
+      font-size: 1.2rem;
+      padding: 8px 12px;
+      border-radius: 8px;
       border: none;
-      padding: 10px 16px;
-      border-radius: 6px;
       cursor: pointer;
-      font-size: 14px;
-    }
-
-    .nav-buttons button:hover {
-      background-color: darkred;
+      background: #fff3e6;
+      color: maroon;
+      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
     }
 
     .countdown {
-      position: absolute;
-      bottom: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.2em;
-      color: darkgreen;
-      font-weight: bold;
+      font-size: 1rem;
+      color: #555;
     }
 
     audio {
       display: none;
     }
 
-    .audio-toggle {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: maroon;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 13px;
-      z-index: 2;
-    }
-
-    @media (max-width: 768px) {
+    @media (max-width: 600px) {
       .name-overlay {
-        font-size: 1.5em;
-      }
-
-      .nav-buttons {
-        flex-direction: column;
-        gap: 6px;
-        bottom: 10px;
+        font-size: 1.2em;
+        top: 14%;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Envelope Page -->
+  <!-- Pages -->
   <div id="page1" class="page active">
     <div class="name-overlay" id="nameOverlay"></div>
     <img src="invite_page1.jpeg" alt="Envelope" />
   </div>
+  <div id="page2" class="page"><img src="invite_page2.jpeg" alt="Page 1" /></div>
+  <div id="page3" class="page"><img src="invite_page3.jpeg" alt="Page 2" /></div>
+  <div id="page4" class="page"><img src="invite_page4.jpeg" alt="Page 3" /></div>
+  <div id="page5" class="page"><img src="invite_page5.jpeg" alt="Page 4" /></div>
 
-  <!-- Other Pages -->
-  <div id="page2" class="page">
-    <img src="invite_page2.jpeg" alt="Page 1" />
+  <!-- Controls -->
+  <div class="controls">
+    <span id="countdownText" class="countdown"></span>
+    <button onclick="goHome()">🏠</button>
+    <button onclick="togglePlay()" id="playBtn">▶️</button>
+    <button onclick="toggleMusic()" id="musicBtn">🔊</button>
   </div>
-  <div id="page3" class="page">
-    <img src="invite_page3.jpeg" alt="Page 2" />
-  </div>
-  <div id="page4" class="page">
-    <img src="invite_page4.jpeg" alt="Page 3" />
-  </div>
-  <div id="page5" class="page">
-    <img src="invite_page5.jpeg" alt="Page 4" />
-  </div>
-
-  <!-- Buttons -->
-  <div class="nav-buttons">
-    <button onclick="goHome()">Home</button>
-    <button onclick="prevPage()">Back</button>
-    <button onclick="pause()">Pause</button>
-    <button onclick="play()">Play</button>
-  </div>
-
-  <!-- Countdown -->
-  <div id="countdown" class="countdown"></div>
 
   <!-- Background Music -->
- <audio id="bgMusic" loop autoplay>
-  <source src="bgmusic.mp3" type="audio/mpeg" />
-</audio>
-  <button class="audio-toggle" onclick="toggleMusic()">🔊 Music</button>
+  <audio id="bgMusic" loop>
+    <source src="your_music_file.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
 
   <script>
     const pages = ['page1', 'page2', 'page3', 'page4', 'page5'];
     let currentPage = 0;
-    let interval;
-    let countdownInterval;
-    const countdownElement = document.getElementById('countdown');
+    let isPlaying = false;
+    let interval = null;
+    let countdown = 2;
+    const countdownText = document.getElementById('countdownText');
+    const music = document.getElementById('bgMusic');
 
     function showPage(index) {
-      if (index < 0 || index >= pages.length) return;
-      document.getElementById(pages[currentPage]).classList.remove('active');
-      currentPage = index;
-      document.getElementById(pages[currentPage]).classList.add('active');
+      pages.forEach((id, i) => {
+        document.getElementById(id).classList.toggle('active', i === index);
+      });
     }
 
-    function startCountdown() {
-      let seconds = 3;
-      countdownElement.innerText = `Next in ${seconds}s`;
-      countdownInterval = setInterval(() => {
-        seconds--;
-        countdownElement.innerText = `Next in ${seconds}s`;
-        if (seconds <= 0) {
-          clearInterval(countdownInterval);
-          autoNextPage();
-        }
-      }, 1000);
-    }
-
-    function autoNextPage() {
+    function nextPage() {
       if (currentPage < pages.length - 1) {
-        showPage(currentPage + 1);
-        startCountdown();
+        currentPage++;
+        showPage(currentPage);
       } else {
-        pause();
-        countdownElement.innerText = '';
-      }
-    }
-
-    function play() {
-      pause();
-      startCountdown();
-    }
-
-    function pause() {
-      clearInterval(interval);
-      clearInterval(countdownInterval);
-      countdownElement.innerText = '';
-    }
-
-    function prevPage() {
-      if (currentPage > 0) {
-        showPage(currentPage - 1);
+        stopAuto();
       }
     }
 
     function goHome() {
-      showPage(0);
+      stopAuto();
+      currentPage = 0;
+      showPage(currentPage);
+    }
+
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      document.getElementById('playBtn').innerText = isPlaying ? '⏸️' : '▶️';
+      if (isPlaying) startAuto(); else stopAuto();
+    }
+
+    function startAuto() {
+      countdown = 2;
+      countdownText.innerText = `Next in ${countdown}s`;
+      interval = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+          nextPage();
+          countdown = 2;
+        }
+        countdownText.innerText = `Next in ${countdown}s`;
+      }, 1000);
+    }
+
+    function stopAuto() {
+      clearInterval(interval);
+      countdownText.innerText = '';
+      document.getElementById('playBtn').innerText = '▶️';
+      isPlaying = false;
     }
 
     function getNameFromURL() {
@@ -211,31 +171,26 @@
       return params.get('name') || '';
     }
 
-    // Add name with 3-space padding
-    document.getElementById('nameOverlay').innerText = '\u00A0\u00A0\u00A0' + getNameFromURL();
-
-    // Music control
-    const music = document.getElementById('bgMusic');
-    let musicPlaying = true;
     function toggleMusic() {
-      if (musicPlaying) {
-        music.pause();
-        musicPlaying = false;
-      } else {
+      if (music.paused) {
         music.play();
-        musicPlaying = true;
+        document.getElementById('musicBtn').innerText = '🔈';
+      } else {
+        music.pause();
+        document.getElementById('musicBtn').innerText = '🔊';
       }
     }
 
-    // Start auto-play on load
-    window.onload = () => {
-      play();
-    };
-  </script>
-<audio id="bgMusic" autoplay loop>
-  <source src="bgmusic.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
+    // Initialize
+    document.getElementById('nameOverlay').innerText = getNameFromURL();
+    showPage(currentPage);
 
+    // Click to manually flip
+    pages.forEach((id, i) => {
+      document.getElementById(id).addEventListener('click', () => {
+        if (!isPlaying) nextPage();
+      });
+    });
+  </script>
 </body>
 </html>
